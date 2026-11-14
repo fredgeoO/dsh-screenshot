@@ -2,11 +2,9 @@
 
 Windows 截图插件 · Windows スクリーンショットプラグイン · Windows screenshot plugin · Plugin de capturas de pantalla para Windows — for [DeepSeek Harness](https://github.com/deepseek-ai).
 
-[中文](#zh) · [日本語](#ja) · [English](#en) · [Español](#es)
+[中文](#中文) · [日本語](#日本語) · [English](#english) · [Español](#español)
 
 ---
-
-<a id="zh"></a>
 
 ## 中文
 
@@ -77,8 +75,6 @@ node test/capture.test.mjs  # 真截屏，需桌面会话
 
 ---
 
-<a id="ja"></a>
-
 ## 日本語
 
 DeepSeek Harness 用の Windows スクリーンショットプラグインです。モデル向けツール 2 つ（`screenshot`、`list_windows`）とランタイム skill（`ui-visual-check`）を提供し、エージェントが実際に画面を見て UI 変更の前後を比較できるようにします。
@@ -148,8 +144,6 @@ node test/capture.test.mjs  # 実際に撮影（デスクトップセッショ�
 
 ---
 
-<a id="en"></a>
-
 ## English
 
 A Windows screenshot plugin for DeepSeek Harness: two model-facing tools (`screenshot`, `list_windows`) plus a runtime skill (`ui-visual-check`) that let the agent actually see windows, pages, and before/after UI changes.
@@ -218,8 +212,6 @@ Captures include whatever is visible on screen — passwords, private messages, 
 [↑ Back to languages](#dsh-screenshot)
 
 ---
-
-<a id="es"></a>
 
 ## Español
 
