@@ -18,6 +18,8 @@
 
 ## 快速开始
 
+> 让**其他 agent** 代为安装时，直接把它指到 [INSTALL.md](INSTALL.md)：那里是自检脚本 + 分步 Checkpoint + 失败对照表，不需要读本文件的散文。
+
 1. 克隆仓库，按 [插件 README](plugin/dsh-screenshot/README.md#安装到-desktop-profile) 把 `plugin/dsh-screenshot` 以 `link:` 方式挂进 DSH desktop profile 的 `dependencies` 与 `dsh.profile.bundles`，然后 `pnpm install`。
 2. 下载 Obscura（URL 截图后端，约 30 MB 内存）：
 

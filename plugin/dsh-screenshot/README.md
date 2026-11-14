@@ -24,6 +24,8 @@ skill 由插件通过 `ctx.skills.register()` 注册，安装一次两者都有�
 
 ## 安装到 desktop profile
 
+> 面向 agent 的完整前置条件、自检脚本与分步 Checkpoint 见仓库根 [INSTALL.md](../../INSTALL.md)。下面是人读的简版。
+
 1. 把仓库放到任意目录，例如 `C:\dev\dsh-screenshot`，插件在 `plugin\dsh-screenshot`。
 2. 编辑 `%USERPROFILE%\.dsh\profiles\desktop\package.json`：
    - `dependencies` 增加 `"@local/dsh-screenshot": "link:C:/dev/dsh-screenshot/plugin/dsh-screenshot"`
