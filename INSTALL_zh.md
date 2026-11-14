@@ -12,8 +12,10 @@
 ```powershell
 git clone https://github.com/fredgeoO/dsh-screenshot C:\dev\dsh-screenshot
 # 编辑 %DSH_PROFILE_DIR%\package.json：dependencies 加 link:、bundles 加 "@local/dsh-screenshot"（见 §2 Step 4）
+Push-Location $env:DSH_PROFILE_DIR
 & "$env:DSH_HOME\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe" `
   "$env:DSH_HOME\dsh-runtimes\dsh-primary-runtime\dependencies\pnpm\bin\pnpm.cjs" install
+Pop-Location
 ```
 
 然后重启 DSH，在**新会话**里验证 `screenshot` / `list_windows` 工具与 `ui-visual-check` skill 存在。
@@ -145,6 +147,8 @@ Test-Path (Join-Path $p 'index.js')            # 期望 True
 若报 `ERR_PNPM_*` 网络相关，先确认能访问 `https://registry.npmjs.org/`；依赖全是 `link:` 时也可试 `... install --offline`。
 **不要**为了绕过错误改用 `npm i` 或全局 `pnpm`。
 
+> **cwd 会决定装到哪。** `pnpm install` 必须在 **profile 目录内**运行。在别处运行，pnpm 会向上找到另一个 `package.json` 并把依赖装到那里——实测过：在仓库目录里运行会把 `@deepseek-ai/*` 装进 `C:\Users\<用户>\node_modules`，还会把用户原有的同名包挪进 `node_modules/.ignored`。
+
 ### Step 6 —— 重载并验证
 
 宿主侧插件改动不走前端 HMR：需要**重启 DSH** 或等它热加载插件。重启会结束当前会话，先和用户确认。
@@ -182,6 +186,7 @@ Pop-Location
 | `Cannot find module '@local/dsh-screenshot'` | `pnpm install` 没跑或失败 | 重跑 Step 5，看 `pnpm_exit` |
 | pnpm 报 `ERR_PNPM_LINKED_PKG_DIR_NOT_EXIST` | `link:` 路径写错/插件目录被移动 | 修正路径后重跑 Step 4/5 |
 | `pnpm: command not found` | 用了 PATH 里的 pnpm | 用 §1 的 `$node $pnpm` 绝对路径 |
+| 依赖装到了别处 / 工具仍不出现 | 命令的 cwd 不是 profile | `Push-Location $env:DSH_PROFILE_DIR` 后重跑，并删掉它误建的 `node_modules`、`pnpm-lock.yaml` |
 | `SCREENSHOT_PYTHON_MISSING` | 运行时 Python 找不到 | 在 `cordis.patch.yml` 的 row config 里设 `pythonPath` |
 | `SCREENSHOT_BROWSER_MISSING` | Obscura 与 Chrome/Edge 都没有 | 执行 Step 2，或设 `obscuraPath`/`browserPath` |
 | `SCREENSHOT_WINDOW_NOT_FOUND` | 标题子串不对 | 先 `list_windows` 拿真实标题 |

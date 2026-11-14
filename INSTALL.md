@@ -10,8 +10,10 @@
 ```powershell
 git clone https://github.com/fredgeoO/dsh-screenshot C:\dev\dsh-screenshot
 # edit %DSH_PROFILE_DIR%\package.json: add the link: dependency and the bundle entry (see §2 Step 4)
+Push-Location $env:DSH_PROFILE_DIR
 & "$env:DSH_HOME\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe" `
   "$env:DSH_HOME\dsh-runtimes\dsh-primary-runtime\dependencies\pnpm\bin\pnpm.cjs" install
+Pop-Location
 ```
 
 Then restart DSH and, in a **new session**, verify that the `screenshot` / `list_windows` tools and the `ui-visual-check` skill exist.
@@ -143,6 +145,8 @@ Test-Path (Join-Path $p 'index.js')            # expect True
 If you see `ERR_PNPM_*` network errors, confirm `https://registry.npmjs.org/` is reachable; with only `link:` dependencies you can also try `... install --offline`.
 **Do not** work around failures with `npm i` or a global `pnpm`.
 
+> **The cwd matters.** `pnpm install` must run **inside the profile directory**. Run it elsewhere and pnpm walks up to another `package.json` and installs there — observed in practice: running it from a repository checkout installed `@deepseek-ai/*` into `C:\Users\<user>\node_modules` and moved the user's existing copies into `node_modules/.ignored`.
+
 ### Step 6 — Reload and verify
 
 Host-side plugin changes do not go through frontend HMR: **restart DSH** or wait for it to hot-load plugins. Restarting ends the current session — confirm with the user first.
@@ -180,6 +184,7 @@ Pop-Location
 | `Cannot find module '@local/dsh-screenshot'` | `pnpm install` never ran or failed | rerun Step 5, read `pnpm_exit` |
 | pnpm `ERR_PNPM_LINKED_PKG_DIR_NOT_EXIST` | wrong `link:` path / plugin directory moved | fix the path, rerun Steps 4–5 |
 | `pnpm: command not found` | used a pnpm from PATH | use the absolute `$node $pnpm` from §1 |
+| packages installed outside the profile / tools still missing | the command ran with the wrong cwd | `Push-Location $env:DSH_PROFILE_DIR` and rerun; delete the stray `node_modules` and `pnpm-lock.yaml` it created |
 | `SCREENSHOT_PYTHON_MISSING` | runtime Python not found | set `pythonPath` in the `cordis.patch.yml` row config |
 | `SCREENSHOT_BROWSER_MISSING` | no Obscura, Chrome, or Edge | run Step 2, or set `obscuraPath`/`browserPath` |
 | `SCREENSHOT_WINDOW_NOT_FOUND` | wrong title substring | call `list_windows` first for the real title |
