@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "license": "MIT",
   "description": "Windows screenshot tools and the ui-visual-check skill for DeepSeek Harness",
   "exports": {
     ".": "./index.js",

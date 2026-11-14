@@ -67,4 +67,6 @@ node test/capture.test.mjs  # 真截屏，需 Windows 桌面会话
 
 ## License
 
-未附带许可证文件；如需商用或再分发，请先在此添加许可证。
+[MIT](LICENSE) © 2026 FredgeoO
+
+可自由使用、修改、再分发，保留版权与许可声明即可。仓库不包含 Obscura 二进制（按需从上游下载），其许可为 Apache-2.0，与本项目分开。
