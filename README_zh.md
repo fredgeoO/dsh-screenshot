@@ -37,7 +37,7 @@ Pop-Location
 
 然后下载 [Obscura](https://github.com/h4ckf0r0day/obscura) 解压到 `bin/obscura/`（URL 截图后端，约 30 MB 内存；不装则退回 Chrome/Edge），重启 DSH，在**新会话**里确认 `screenshot`、`list_windows` 与 `ui-visual-check` 出现。
 
-> 让其他 agent 代为安装：直接指向 [INSTALL.md](INSTALL.md)，内含自检脚本、分步 Checkpoint 与失败对照表。
+> 让其他 agent 代为安装：直接指向 [INSTALL_zh.md](INSTALL_zh.md)（英文原文为 [INSTALL.md](INSTALL.md)），内含自检脚本、分步 Checkpoint 与失败对照表。
 
 ## 用法
 

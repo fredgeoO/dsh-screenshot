@@ -37,7 +37,7 @@ Pop-Location
 
 続いて [Obscura](https://github.com/h4ckf0r0day/obscura) を `bin/obscura/` に展開し（URL キャプチャ用、メモリ約 30 MB。未導入なら Chrome/Edge にフォールバック）、DSH を再起動して、**新しいセッション**で `screenshot`、`list_windows`、`ui-visual-check` が現れることを確認します。
 
-> 他のエージェントにインストールさせる場合は [INSTALL.md](INSTALL.md)（中国語・エージェント向け）を渡してください。自己診断スクリプト、段階ごとのチェックポイント、失敗時の対処表があります。
+> 他のエージェントにインストールさせる場合は [INSTALL.md](INSTALL.md)（英語・エージェント向け）を渡してください。自己診断スクリプト、段階ごとのチェックポイント、失敗時の対処表があります。
 
 ## 使い方
 

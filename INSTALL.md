@@ -1,24 +1,26 @@
-# INSTALL.md —— 给 agent 的安装前置条件与步骤
+# INSTALL.md — prerequisites and installation for agents
 
-> 读者是 **agent**，不是人。照做即可，每步都有 **Checkpoint**；Checkpoint 不通过就停下报告，不要继续往下猜。
-> 仓库：<https://github.com/fredgeoO/dsh-screenshot>　验证环境：Windows 11 + DSH Desktop `0.2.2-rc.3`。
+> The reader is an **agent**, not a human. Follow the steps; every step ends in a **Checkpoint**. If a Checkpoint fails, stop and report — do not keep guessing.
+> Repository: <https://github.com/fredgeoO/dsh-screenshot>　Verified on: Windows 11 + DSH Desktop `0.2.2-rc.3`.
 
-## 0. TL;DR（三条命令，仅在依赖齐全时）
+**English** · [中文](INSTALL_zh.md)
+
+## 0. TL;DR (three commands, only when the runtime is complete)
 
 ```powershell
 git clone https://github.com/fredgeoO/dsh-screenshot C:\dev\dsh-screenshot
-# 编辑 %DSH_PROFILE_DIR%\package.json：dependencies 加 link:、bundles 加 "@local/dsh-screenshot"（见 §2 Step 4）
+# edit %DSH_PROFILE_DIR%\package.json: add the link: dependency and the bundle entry (see §2 Step 4)
 & "$env:DSH_HOME\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe" `
   "$env:DSH_HOME\dsh-runtimes\dsh-primary-runtime\dependencies\pnpm\bin\pnpm.cjs" install
 ```
 
-然后重启 DSH，在**新会话**里验证 `screenshot` / `list_windows` 工具与 `ui-visual-check` skill 存在。
+Then restart DSH and, in a **new session**, verify that the `screenshot` / `list_windows` tools and the `ui-visual-check` skill exist.
 
 ---
 
-## 1. 硬性前置条件
+## 1. Hard prerequisites
 
-**不要猜路径**：先跑下面这段自检，全部 PASS 再往下。
+**Do not guess paths.** Run the self-check below first; continue only when everything is PASS.
 
 ```powershell
 $profile = if ($env:DSH_PROFILE_DIR) { $env:DSH_PROFILE_DIR } else { Join-Path $env:USERPROFILE '.dsh\profiles\desktop' }
@@ -32,78 +34,78 @@ $ok = $true
 function Check($name, $cond, $hint) {
   if ($cond) { "PASS  $name" } else { "FAIL  $name  ->  $hint"; $script:ok = $false }
 }
-Check 'Windows 10/11'            ([Environment]::OSVersion.Version.Major -ge 10) '只支持 Windows 10/11'
-Check 'DSH profile 目录'          (Test-Path $profile)        'DSH Desktop 未安装/未启动过；先正常启动一次'
-Check 'profile 是 pnpm workspace' (Test-Path (Join-Path $profile 'pnpm-workspace.yaml')) 'profile 被改坏或不是标准布局'
-Check 'profile 已有 node_modules' (Test-Path (Join-Path $profile 'node_modules')) '先让 DSH 正常启动一次，让它装好基础依赖'
-Check '自带 node 24'              (Test-Path $node)          'DSH 运行时缺失；重装 DSH Desktop'
-Check '自带 pnpm 11'              (Test-Path $pnpm)          '同上'
-Check '自带 python 3.12'          (Test-Path $python)        '同上'
-Check 'Pillow 可用'               ((& $python -c "import PIL;print(PIL.__version__)" 2>$null) -ne $null) '运行时缺 Pillow；重装 DSH Desktop'
-Check 'git'                       ($null -ne (Get-Command git -ErrorAction SilentlyContinue)) '安装 Git for Windows'
-if ($ok) { 'ALL PASS' } else { 'BLOCKED: 先修上面 FAIL 项' }
+Check 'Windows 10/11'            ([Environment]::OSVersion.Version.Major -ge 10) 'Windows 10/11 only'
+Check 'DSH profile dir'          (Test-Path $profile)        'DSH Desktop missing or never started; start it once'
+Check 'profile is a pnpm workspace' (Test-Path (Join-Path $profile 'pnpm-workspace.yaml')) 'profile broken or non-standard'
+Check 'profile has node_modules' (Test-Path (Join-Path $profile 'node_modules')) 'start DSH once so it installs its base dependencies'
+Check 'bundled node 24'          (Test-Path $node)          'DSH runtime missing; reinstall DSH Desktop'
+Check 'bundled pnpm 11'          (Test-Path $pnpm)          'same as above'
+Check 'bundled python 3.12'      (Test-Path $python)        'same as above'
+Check 'Pillow available'         ((& $python -c "import PIL;print(PIL.__version__)" 2>$null) -ne $null) 'runtime lacks Pillow; reinstall DSH Desktop'
+Check 'git'                      ($null -ne (Get-Command git -ErrorAction SilentlyContinue)) 'install Git for Windows'
+if ($ok) { 'ALL PASS' } else { 'BLOCKED: fix the FAIL lines first' }
 ```
 
-| 条件 | 说明 | 缺失后果 |
+| Requirement | Why | If missing |
 |---|---|---|
-| Windows 10/11 x64 | 用 Win32 API + DWM 取窗口矩形 | 完全不可用（仅 macOS/Linux 不支持） |
-| DSH Desktop ≥ `0.2.2-rc.3` | 插件通过 profile 的 `link:` + `dsh.profile.bundles` 装载 | 工具不会注册 |
-| 自带 Node 24 / pnpm 11 | **不要用全局 node/npm/pnpm**，版本与 `nodeLinker: hoisted` 不一致会装歪 | `pnpm install` 报 peer/hoist 错 |
-| 自带 Python 3.12 + Pillow | `scripts/capture.py` 的唯一依赖 | `SCREENSHOT_PYTHON_MISSING` |
-| 网络（仅首次） | 下载 Obscura；可选但 URL 截图需要 | URL 截图回退 Chrome/Edge；两者都没有则 `SCREENSHOT_BROWSER_MISSING` |
-| Chrome 或 Edge（可选） | 需要**精确视口**（传 `width/height/scale`）时用 | 只能截 Obscura 固定 1280×720 |
+| Windows 10/11 x64 | Uses Win32 APIs + DWM for window rectangles | Unusable (no macOS/Linux support) |
+| DSH Desktop ≥ `0.2.2-rc.3` | Loads plugins via profile `link:` + `dsh.profile.bundles` | Tools are never registered |
+| Bundled Node 24 / pnpm 11 | **Do not use a global node/npm/pnpm**; version and `nodeLinker: hoisted` would mismatch | `pnpm install` fails with peer/hoist errors |
+| Bundled Python 3.12 + Pillow | The only dependency of `scripts/capture.py` | `SCREENSHOT_PYTHON_MISSING` |
+| Network (first run only) | Downloads Obscura; optional but needed for URL capture | URL capture falls back to Chrome/Edge; neither → `SCREENSHOT_BROWSER_MISSING` |
+| Chrome or Edge (optional) | Needed for **exact viewports** (`width/height/scale`) | Only Obscura's fixed 1280×720 |
 
-> 运行时版本以 `$home2\dsh-runtimes\dsh-primary-runtime\runtime.json` 为准（本机为 node `24.21.0`、pnpm `11.28.5`、python `3.12.14`、Pillow `12.3.0`）。
+> Runtime versions come from `$home2\dsh-runtimes\dsh-primary-runtime\runtime.json` (this machine: node `24.21.0`, pnpm `11.28.5`, python `3.12.14`, Pillow `12.3.0`).
 
 ---
 
-## 2. 安装步骤
+## 2. Installation
 
-### Step 1 —— 取得仓库，确定插件路径
+### Step 1 — Get the repo and fix the plugin path
 
 ```powershell
 if (-not (Test-Path C:\dev\dsh-screenshot)) {
   git clone https://github.com/fredgeoO/dsh-screenshot C:\dev\dsh-screenshot
 }
 $repo = 'C:\dev\dsh-screenshot\plugin\dsh-screenshot'
-Test-Path (Join-Path $repo 'index.js')     # Checkpoint: True
+Test-Path (Join-Path $repo 'index.js')          # Checkpoint: True
 Test-Path (Join-Path $repo 'cordis.patch.yml')  # Checkpoint: True
 ```
 
-- 仓库根是 `dsh-screenshot`，**插件在 `plugin\dsh-screenshot` 子目录**，不要指向仓库根。
-- 安装走 `link:`（符号链接），**不要**把插件目录复制进 profile：复制后改代码不生效，且升级要重装。
+- The repository root is `dsh-screenshot`; **the plugin lives in the `plugin\dsh-screenshot` subdirectory**. Do not point at the repository root.
+- Install through `link:` (a symlink). **Never copy** the plugin into the profile: edits then stop taking effect and upgrades require a reinstall.
 
-### Step 2 ——（可选）下载 Obscura
+### Step 2 — (Optional) Download Obscura
 
-没有它也能截窗口/全屏，只是 `target:"url"` 会退到 Chrome/Edge。
+Without it you can still capture windows and the screen; only `target:"url"` falls back to Chrome/Edge.
 
 ```powershell
 $bin = 'C:\dev\dsh-screenshot\bin'
 $zip = Join-Path $bin 'obscura-x86_64-windows.zip'
 New-Item -ItemType Directory -Force (Join-Path $bin 'obscura') | Out-Null
 curl.exe -L --fail -o $zip 'https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.7/obscura-x86_64-windows.zip'
-(Get-FileHash $zip -Algorithm SHA256).Hash   # 期望 be983b663552e11faf8c1e07696578bad622dbeb48afb9f59036032ca8e97fb3
+(Get-FileHash $zip -Algorithm SHA256).Hash   # expected be983b663552e11faf8c1e07696578bad622dbeb48afb9f59036032ca8e97fb3
 Expand-Archive $zip -DestinationPath (Join-Path $bin 'obscura') -Force
 Remove-Item $zip
 Test-Path (Join-Path $bin 'obscura\obscura.exe')   # Checkpoint: True
 ```
 
-`obscura.exe`、`obscura-worker.exe`、两个 `vcruntime140*.dll` 必须在同一目录，别只留 exe。
+`obscura.exe`, `obscura-worker.exe`, and both `vcruntime140*.dll` must stay in the same directory; do not keep the exe alone.
 
-### Step 3 —— 备份 profile 的 `package.json`
+### Step 3 — Back up the profile's `package.json`
 
 ```powershell
 Copy-Item "$profile\package.json" "$profile\package.json.bak-screenshot-$(Get-Date -Format yyyyMMdd-HHmmss)"
 ```
 
-### Step 4 —— 幂等注册（改两处，缺一不可）
+### Step 4 — Idempotent registration (two edits, both required)
 
 ```powershell
-$repo    = 'C:\dev\dsh-screenshot\plugin\dsh-screenshot'   # 按 Step 1 实际路径
+$repo    = 'C:\dev\dsh-screenshot\plugin\dsh-screenshot'   # the actual path from Step 1
 $profile = if ($env:DSH_PROFILE_DIR) { $env:DSH_PROFILE_DIR } else { Join-Path $env:USERPROFILE '.dsh\profiles\desktop' }
 $pkgPath = Join-Path $profile 'package.json'
 $pkg     = Get-Content $pkgPath -Raw | ConvertFrom-Json
-$link    = 'link:' + ($repo -replace '\\', '/')            # link 值必须用正斜杠
+$link    = 'link:' + ($repo -replace '\\', '/')            # link values must use forward slashes
 
 $pkg.dependencies | Add-Member -NotePropertyName '@local/dsh-screenshot' -NotePropertyValue $link -Force
 if ($pkg.dsh.profile.bundles -notcontains '@local/dsh-screenshot') {
@@ -113,14 +115,14 @@ if ($pkg.dsh.profile.bundles -notcontains '@local/dsh-screenshot') {
 
 # Checkpoint
 $check = Get-Content $pkgPath -Raw | ConvertFrom-Json
-$check.dependencies.'@local/dsh-screenshot'          # 期望 link:...
-$check.dsh.profile.bundles -contains '@local/dsh-screenshot'   # 期望 True
+$check.dependencies.'@local/dsh-screenshot'                    # expect link:...
+$check.dsh.profile.bundles -contains '@local/dsh-screenshot'   # expect True
 ```
 
-- `dependencies` 里的 `link` 要求**绝对路径 + 正斜杠**；用 `C:\...` 反斜杠会解析失败。
-- `bundles` 决定插件被加载；漏了它，装完依赖也不会有工具。
+- The `link` value must be an **absolute path with forward slashes**; `C:\...` backslashes fail to resolve.
+- `bundles` is what makes DSH load the plugin. Without it the dependency installs but no tools appear.
 
-### Step 5 —— 用自带 pnpm 安装
+### Step 5 — Install with the bundled pnpm
 
 ```powershell
 Push-Location $profile
@@ -130,80 +132,80 @@ Pop-Location
 "pnpm_exit=$code"        # Checkpoint: 0
 ```
 
-Checkpoint（两个都要看）：
+Checkpoints (both):
 
 ```powershell
 $p = Join-Path $profile 'node_modules\@local\dsh-screenshot'
-Test-Path (Join-Path $p 'index.js')            # 期望 True
-(Get-Item $p).Target                           # 期望指向 Step 1 的 $repo
+Test-Path (Join-Path $p 'index.js')            # expect True
+(Get-Item $p).Target                           # expect the Step 1 $repo path
 ```
 
-若报 `ERR_PNPM_*` 网络相关，先确认能访问 `https://registry.npmjs.org/`；依赖全是 `link:` 时也可试 `... install --offline`。
-**不要**为了绕过错误改用 `npm i` 或全局 `pnpm`。
+If you see `ERR_PNPM_*` network errors, confirm `https://registry.npmjs.org/` is reachable; with only `link:` dependencies you can also try `... install --offline`.
+**Do not** work around failures with `npm i` or a global `pnpm`.
 
-### Step 6 —— 重载并验证
+### Step 6 — Reload and verify
 
-宿主侧插件改动不走前端 HMR：需要**重启 DSH** 或等它热加载插件。重启会结束当前会话，先和用户确认。
+Host-side plugin changes do not go through frontend HMR: **restart DSH** or wait for it to hot-load plugins. Restarting ends the current session — confirm with the user first.
 
-新会话里的 Checkpoint（缺一即失败）：
+Checkpoints in a new session (any missing one means failure):
 
-| 检查 | 期望 |
+| Check | Expectation |
 |---|---|
-| 工具 `list_windows` | 返回表格，含标题/PID/进程/矩形/前台 |
-| 工具 `screenshot` | `target:"active", inline:false` 返回 PNG 路径 |
-| skill `ui-visual-check` | 出现在 skill 列表 |
-| 无 `SCREENSHOT_PYTHON_MISSING` | 说明 Python 发现成功 |
+| tool `list_windows` | returns a table with title/PID/process/rect/foreground |
+| tool `screenshot` | `target:"active", inline:false` returns a PNG path |
+| skill `ui-visual-check` | appears in the skill list |
+| no `SCREENSHOT_PYTHON_MISSING` | Python discovery succeeded |
 
 ---
 
-## 3. 验收清单
+## 3. Acceptance
 
 ```powershell
 Push-Location 'C:\dev\dsh-screenshot\plugin\dsh-screenshot'
-& $node test/unit.test.mjs      # 期望 tests 10 / pass 10 / fail 0（不需要 DSH）
-& $node test/capture.test.mjs   # 真截屏；需要交互式桌面会话，远程/锁屏会失败
+& $node test/unit.test.mjs      # expect tests 10 / pass 10 / fail 0 (no DSH needed)
+& $node test/capture.test.mjs   # real capture; needs an interactive desktop session
 Pop-Location
 ```
 
-- **不要**用 `node --test`：沙箱下管道受限会 `EPERM`，直接跑测试文件。
-- `capture.test.mjs` 会在临时目录写 PNG 并清理；失败先看是不是无桌面会话。
+- **Do not** use `node --test`: pipe restrictions in the sandbox produce `EPERM`. Run the test files directly.
+- `capture.test.mjs` writes PNGs to a temp directory and cleans up; if it fails, first check whether a desktop session exists.
 
 ---
 
-## 4. 常见失败与处理
+## 4. Troubleshooting
 
-| 现象 | 原因 | 处理 |
+| Symptom | Cause | Fix |
 |---|---|---|
-| 新会话没有 `screenshot` 工具 | `bundles` 漏了，或没重启 | 补 Step 4 第二处 → 重启 |
-| `Cannot find module '@local/dsh-screenshot'` | `pnpm install` 没跑或失败 | 重跑 Step 5，看 `pnpm_exit` |
-| pnpm 报 `ERR_PNPM_LINKED_PKG_DIR_NOT_EXIST` | `link:` 路径写错/插件目录被移动 | 修正路径后重跑 Step 4/5 |
-| `pnpm: command not found` | 用了 PATH 里的 pnpm | 用 §1 的 `$node $pnpm` 绝对路径 |
-| `SCREENSHOT_PYTHON_MISSING` | 运行时 Python 找不到 | 在 `cordis.patch.yml` 的 row config 里设 `pythonPath` |
-| `SCREENSHOT_BROWSER_MISSING` | Obscura 与 Chrome/Edge 都没有 | 执行 Step 2，或设 `obscuraPath`/`browserPath` |
-| `SCREENSHOT_WINDOW_NOT_FOUND` | 标题子串不对 | 先 `list_windows` 拿真实标题 |
-| `SCREENSHOT_BLACK` / `SCREENSHOT_OFFSCREEN` | 窗口被遮挡/最小化/移出屏幕 | `activate:true`，恢复窗口，或改截 `screen` |
-| `SCREENSHOT_UNSUPPORTED_MODEL` | 当前模型路由不支持图像输入 | 换视觉路由，或 `inline:false` 后 `read_image` |
+| `screenshot` tool missing in a new session | `bundles` entry missing, or DSH not restarted | add Step 4's second edit → restart |
+| `Cannot find module '@local/dsh-screenshot'` | `pnpm install` never ran or failed | rerun Step 5, read `pnpm_exit` |
+| pnpm `ERR_PNPM_LINKED_PKG_DIR_NOT_EXIST` | wrong `link:` path / plugin directory moved | fix the path, rerun Steps 4–5 |
+| `pnpm: command not found` | used a pnpm from PATH | use the absolute `$node $pnpm` from §1 |
+| `SCREENSHOT_PYTHON_MISSING` | runtime Python not found | set `pythonPath` in the `cordis.patch.yml` row config |
+| `SCREENSHOT_BROWSER_MISSING` | no Obscura, Chrome, or Edge | run Step 2, or set `obscuraPath`/`browserPath` |
+| `SCREENSHOT_WINDOW_NOT_FOUND` | wrong title substring | call `list_windows` first for the real title |
+| `SCREENSHOT_BLACK` / `SCREENSHOT_OFFSCREEN` | window occluded, minimized, or off-screen | `activate:true`, restore the window, or capture `screen` |
+| `SCREENSHOT_UNSUPPORTED_MODEL` | the current model route declares no image input | switch to a vision route, or `inline:false` + `read_image` |
 
 ---
 
-## 5. 回滚
+## 5. Rollback
 
 ```powershell
 $profile = if ($env:DSH_PROFILE_DIR) { $env:DSH_PROFILE_DIR } else { Join-Path $env:USERPROFILE '.dsh\profiles\desktop' }
 Copy-Item (Get-ChildItem "$profile\package.json.bak-screenshot-*" | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName "$profile\package.json" -Force
 Push-Location $profile; & $node $pnpm install; Pop-Location
-# 然后重启 DSH
+# then restart DSH
 ```
 
-或手动：删掉 `dependencies` 里的 `@local/dsh-screenshot` 与 `bundles` 里的同名项 → `pnpm install` → 重启。仓库和 `bin/` 可以直接删。
+Or manually: remove `@local/dsh-screenshot` from `dependencies` and from `bundles` → `pnpm install` → restart. The repository and `bin/` can simply be deleted.
 
 ---
 
-## 6. agent 不要做的事
+## 6. Things an agent must not do
 
-1. 不要 `cp`/`robocopy` 插件目录进 profile —— 必须 `link:`。
-2. 不要用全局 `node`/`pnpm`/`npm`，只用 §1 发现的 DSH 运行时。
-3. 不要改系统级配置（`gitconfig`、系统 PATH、系统 Python）。
-4. 不要手改 `node_modules`；只改 profile `package.json` 再 `pnpm install`。
-5. 不要在没重启时断言“工具已安装”——以**新会话**里工具真实出现为准。
-6. 不要把截图里的密码/私信/密钥贴进仓库或日志；截图会随图像请求发给模型提供方。
+1. Do not `cp`/`robocopy` the plugin into the profile — it must be `link:`.
+2. Do not use a global `node`/`pnpm`/`npm`; only the DSH runtime discovered in §1.
+3. Do not change system-level configuration (`gitconfig`, system PATH, system Python).
+4. Do not edit `node_modules` by hand; edit the profile `package.json` and run `pnpm install`.
+5. Do not claim "the tool is installed" before a restart — the **new session** is the only evidence.
+6. Do not paste passwords, private messages, or keys from screenshots into the repo or logs; captures are sent to the model provider.

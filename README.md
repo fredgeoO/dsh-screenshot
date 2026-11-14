@@ -35,7 +35,7 @@ Pop-Location
 
 Then unpack [Obscura](https://github.com/h4ckf0r0day/obscura) into `bin/obscura/` — the URL backend, about 30 MB of RAM; without it URL capture falls back to Chrome/Edge. Restart DSH and verify in a **new session** that `screenshot`, `list_windows`, and `ui-visual-check` are present.
 
-> Handing the installation to another agent? Point it at [INSTALL.md](INSTALL.md) (Chinese, agent-oriented): self-check script, per-step checkpoints, and a failure table.
+> Handing the installation to another agent? Point it at [INSTALL.md](INSTALL.md) (agent-oriented: self-check script, per-step checkpoints, failure table; [中文译本](INSTALL_zh.md)).
 
 ## Usage
 

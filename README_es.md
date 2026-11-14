@@ -37,7 +37,7 @@ Pop-Location
 
 Después descomprime [Obscura](https://github.com/h4ckf0r0day/obscura) en `bin/obscura/` (backend para URL, ~30 MB de RAM; sin él, las capturas de URL usan Chrome/Edge), reinicia DSH y comprueba en una **sesión nueva** que aparecen `screenshot`, `list_windows` y `ui-visual-check`.
 
-> ¿Le encargas la instalación a otro agente? Pásale [INSTALL.md](INSTALL.md) (en chino, orientado a agentes): script de autodiagnóstico, checkpoints por paso y tabla de fallos.
+> ¿Le encargas la instalación a otro agente? Pásale [INSTALL.md](INSTALL.md) (en inglés, orientado a agentes): script de autodiagnóstico, checkpoints por paso y tabla de fallos.
 
 ## Uso
 
