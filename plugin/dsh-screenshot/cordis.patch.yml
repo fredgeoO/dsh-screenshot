@@ -1,0 +1,15 @@
+# Screenshot capture tools + the ui-visual-check runtime skill.
+#
+# The row config is the deployment contract; edit it here, not in index.js.
+# Empty outputDir means $DSH_HOME/cache/screenshots.
+- insert:
+    - id: screenshot
+      name: '@local/dsh-screenshot'
+      config:
+        maxEdge: 2560
+        inline: true
+        retentionDays: 7
+        maxFiles: 200
+        # pythonPath: C:\path\to\python.exe
+        # obscuraPath: C:\dev\dsh-screenshot\bin\obscura\obscura.exe
+        # browserPath: C:\Program Files\Google\Chrome\Application\chrome.exe

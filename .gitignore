@@ -1,0 +1,13 @@
+# Obscura 二进制（~150 MB，超过 GitHub 单文件 100 MB 限制，按 README 自行下载）
+bin/
+
+# 依赖与产物
+node_modules/
+*.zip
+*.png
+*.log
+
+# 系统垃圾
+.DS_Store
+Thumbs.db
+desktop.ini

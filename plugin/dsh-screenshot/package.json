@@ -1,0 +1,26 @@
+{
+  "name": "@local/dsh-screenshot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Windows screenshot tools and the ui-visual-check skill for DeepSeek Harness",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "cordis.patch.yml",
+    "scripts/capture.py",
+    "skill/SKILL.md",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
